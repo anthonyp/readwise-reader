@@ -1,0 +1,25 @@
+{
+  "name": "readwise-reader",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/node": "^22.13.10",
+    "dotenv": "^16.4.7",
+    "jsdom": "^26.0.0",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2"
+  }
+}
