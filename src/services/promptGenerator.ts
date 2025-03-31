@@ -68,8 +68,7 @@ export function generateRecommendationPrompt(
     .join("\n\n");
 
   // Construct the full prompt
-  return `
-Please analyze the following information and recommend which articles I should save for reading this week:
+  return `Please analyze the following information and recommend which articles I should save for reading this week:
 
 ===== READING PATTERNS =====
 Based on my history, I read approximately ${analysis.readingCapacityPerDay.toFixed(
@@ -117,8 +116,7 @@ https://example.com/article1
 https://example.com/article2
 https://example.com/article3
 
-DO NOT include any additional text, numbers, bullet points, or formatting around the URLs in this final list.
-`;
+DO NOT include any additional text, numbers, bullet points, or formatting around the URLs in this final list.`;
 }
 
 /**
