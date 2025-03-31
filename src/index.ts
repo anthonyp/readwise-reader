@@ -143,18 +143,46 @@ async function recommendArticles() {
     console.log(
       "\nAttempting to extract article titles from the AI response and match them to URLs..."
     );
-    const recommendedUrls = extractTitlesAndMatchURLs(
-      aiResponse,
-      allTLDRArticles
-    );
-    console.log(
-      `\nExtracted and matched ${recommendedUrls.length} recommended articles from the AI response.`
-    );
 
-    if (recommendedUrls.length === 0) {
+    let recommendedUrls: string[] = [];
+
+    try {
+      recommendedUrls = extractTitlesAndMatchURLs(aiResponse, allTLDRArticles);
       console.log(
-        "No article matches were found. Please check your input and try again."
+        `\nExtracted and matched ${recommendedUrls.length} recommended articles from the AI response.`
       );
+
+      if (recommendedUrls.length === 0) {
+        console.log(
+          "No article matches were found. Please check your input and try again."
+        );
+
+        // Save the problematic response to a file for debugging
+        const debugFilename = await saveTextToFile(aiResponse, {
+          filenamePrefix: "debug-ai-response",
+        });
+        console.log(
+          `Saved problematic AI response to ${debugFilename} for debugging purposes.`
+        );
+
+        return;
+      }
+
+      // Display the URLs and ask for confirmation
+      console.log("\nURLs to be saved:");
+      recommendedUrls.forEach((url, index) => {
+        // Find the article title for this URL
+        const article = allTLDRArticles.find((a) => a.url === url);
+        const title = article ? article.title : "Unknown title";
+        console.log(`${index + 1}. ${title}\n   ${url}`);
+      });
+    } catch (error) {
+      console.error("\nError extracting article titles from AI response:");
+      if (error instanceof Error) {
+        console.error(error.message);
+      } else {
+        console.error(String(error));
+      }
 
       // Save the problematic response to a file for debugging
       const debugFilename = await saveTextToFile(aiResponse, {
@@ -164,17 +192,19 @@ async function recommendArticles() {
         `Saved problematic AI response to ${debugFilename} for debugging purposes.`
       );
 
+      console.log("\nSome possible solutions to try:");
+      console.log(
+        "1. Make sure the AI response format follows the requested format exactly"
+      );
+      console.log(
+        "2. Check if the titles in the AI response match the original TLDR newsletter titles"
+      );
+      console.log(
+        "3. Try running the process again with a clearer instruction to the AI"
+      );
+
       return;
     }
-
-    // Display the URLs and ask for confirmation
-    console.log("\nURLs to be saved:");
-    recommendedUrls.forEach((url, index) => {
-      // Find the article title for this URL
-      const article = allTLDRArticles.find((a) => a.url === url);
-      const title = article ? article.title : "Unknown title";
-      console.log(`${index + 1}. ${title}\n   ${url}`);
-    });
 
     console.log("\nPlease review the URLs above for accuracy.");
     console.log(
@@ -207,13 +237,14 @@ async function recommendArticles() {
       if (removeIndexes.trim()) {
         const indexesToRemove = removeIndexes
           .split(",")
-          .map((idx) => parseInt(idx.trim(), 10) - 1) // Convert to 0-based index
+          .map((idx: string) => parseInt(idx.trim(), 10) - 1) // Convert to 0-based index
           .filter(
-            (idx) => !isNaN(idx) && idx >= 0 && idx < recommendedUrls.length
+            (idx: number) =>
+              !isNaN(idx) && idx >= 0 && idx < recommendedUrls.length
           );
 
         finalUrls = recommendedUrls.filter(
-          (_, idx) => !indexesToRemove.includes(idx)
+          (_, idx: number) => !indexesToRemove.includes(idx)
         );
 
         console.log("\nUpdated URL list:");

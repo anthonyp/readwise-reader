@@ -180,6 +180,7 @@ DO NOT include any additional text, numbers, bullet points, or formatting around
  * @param aiResponse - The text response from the AI
  * @param tldrArticles - The original TLDR articles with titles and URLs
  * @returns An array of matched URLs
+ * @throws Error if not all extracted titles can be matched to URLs
  */
 export function extractTitlesAndMatchURLs(
   aiResponse: string,
@@ -190,7 +191,7 @@ export function extractTitlesAndMatchURLs(
 
   // Match titles enclosed in double quotes
   const titleRegex = /"([^"]+)"/g;
-  const matches = [];
+  const matches: string[] = [];
   let match;
 
   while ((match = titleRegex.exec(aiResponse)) !== null) {
@@ -244,6 +245,27 @@ export function extractTitlesAndMatchURLs(
   console.log(
     `Successfully matched ${matchedUrls.length} out of ${matches.length} titles to URLs`
   );
+
+  // Throw an error if not all titles were matched to URLs
+  if (matchedUrls.length !== matches.length) {
+    const unmatchedTitles = matches.filter((title) => {
+      // Find the titles that didn't get matched properly
+      return (
+        !titleToUrlMap.has(title) &&
+        !Array.from(titleToUrlMap.keys()).some(
+          (articleTitle) =>
+            articleTitle.toLowerCase() === title.toLowerCase() ||
+            articleTitle.toLowerCase().replace(/[^\w]/g, "") ===
+              title.toLowerCase().replace(/[^\w]/g, "")
+        )
+      );
+    });
+
+    throw new Error(
+      `Failed to match all titles to URLs. Found ${matches.length} titles but only matched ${matchedUrls.length} URLs. ` +
+        `Unmatched titles: ${unmatchedTitles.join(", ")}`
+    );
+  }
 
   return matchedUrls;
 }

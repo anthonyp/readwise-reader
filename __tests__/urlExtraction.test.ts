@@ -2,32 +2,25 @@ import { extractTitlesAndMatchURLs } from "../src/services/promptGenerator";
 import { TLDRArticle } from "../src/types";
 
 describe("URL Extraction Tests", () => {
-  it("should extract URLs correctly", async () => {
+  it("should extract URLs correctly for valid matches", async () => {
     const testCases = [
       {
-        result: "fail",
-        name: "Simple titles list",
+        name: "Simple titles list that should pass",
         input: `Here's my analysis...
           
     And here are the recommended titles:
     "How to Build a Scalable Architecture for Your NextJS Project"
-    "Getting Started with CSS Grid"
-    "The Future of AI in Software Development"`,
+    "Getting Started with CSS Grid"`,
         sampleTitles: [
           "How to Build a Scalable Architecture for Your NextJS Project",
           "Getting Started with CSS Grid",
-          "The Future of AI in Software Development",
-          "Unmatched Title That Shouldn't Be Found",
         ],
         sampleUrls: [
           "https://dev.to/alexeagleson/how-to-build-scalable-architecture-for-your-nextjs-project-2pb7",
           "https://css-tricks.com/getting-started-with-css-grid/",
-          "https://example.com/ai-in-software-dev",
-          "https://example.com/unmatched-article",
         ],
       },
       {
-        result: "pass",
         name: "Titles with slight variations",
         input: `Analysis... 
     
@@ -44,7 +37,6 @@ describe("URL Extraction Tests", () => {
         ],
       },
       {
-        result: "pass",
         name: "Titles with explanation",
         input: `Here are my recommendations:
     
@@ -78,16 +70,44 @@ describe("URL Extraction Tests", () => {
       );
 
       // Assert: Check that the matched URLs are as expected
-      if (testCase.result === "pass") {
-        expect(matchedUrls).toEqual(testCase.sampleUrls);
-        matchedUrls.forEach((url, i) => {
-          const article = sampleArticles.find((a) => a.url === url);
-          expect(article).toBeDefined();
-          expect(article?.title).toBe(testCase.sampleTitles[i]);
-        });
-      } else {
-        expect(matchedUrls).not.toEqual(testCase.sampleUrls);
-      }
+      expect(matchedUrls).toEqual(testCase.sampleUrls);
+      matchedUrls.forEach((url, i) => {
+        const article = sampleArticles.find((a) => a.url === url);
+        expect(article).toBeDefined();
+        expect(article?.title).toBe(testCase.sampleTitles[i]);
+      });
     });
+  });
+
+  it("should throw an error when titles do not match URLs", async () => {
+    const input = `Here's my analysis...
+          
+    And here are the recommended titles:
+    "How to Build a Scalable Architecture for Your NextJS Project"
+    "Getting Started with CSS Grid"
+    "The Future of AI in Software Development"`;
+
+    const sampleTitles = [
+      "How to Build a Scalable Architecture for Your NextJS Project",
+      "Getting Started with CSS Grid",
+      // Missing "The Future of AI in Software Development" causes an error
+    ];
+
+    const sampleUrls = [
+      "https://dev.to/alexeagleson/how-to-build-scalable-architecture-for-your-nextjs-project-2pb7",
+      "https://css-tricks.com/getting-started-with-css-grid/",
+    ];
+
+    // Create sample TLDR articles for testing
+    const sampleArticles: TLDRArticle[] = sampleTitles.map((title, index) => ({
+      title,
+      url: sampleUrls[index],
+      summary: `Summary for ${title}`,
+    }));
+
+    // Test that an error is thrown when not all titles can be matched
+    expect(() => {
+      extractTitlesAndMatchURLs(input, sampleArticles);
+    }).toThrow(/Failed to match all titles to URLs/);
   });
 });
