@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
+    "help": "ts-node src/index.ts --help",
     "analyze-reading": "ts-node src/index.ts --analyze-reading",
     "recommend": "ts-node src/index.ts --recommend",
     "test-url-extraction": "ts-node src/index.ts --test-url-extraction",
