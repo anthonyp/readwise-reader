@@ -120,6 +120,100 @@ DO NOT include any additional text, numbers, bullet points, or formatting around
 }
 
 /**
+ * Generates a prompt for AI analysis of user's reading patterns over a 6-month period
+ * @param wellReadDocs - Documents the user has read and enjoyed (>75% read) over the past 6 months
+ * @returns A string containing the prompt for an AI assistant to analyze reading patterns
+ */
+export function generateReadingPatternAnalysisPrompt(
+  wellReadDocs: Document[]
+): string {
+  // Create a part of the prompt that lists the user's reading history
+  const readingHistoryPrompt = wellReadDocs
+    .map((doc) => {
+      return `- "${doc.title}" (${doc.url})${
+        doc.last_moved_at ? `\n   Date read: ${doc.last_moved_at}` : ""
+      }${doc.word_count ? `\n   Word Count: ${doc.word_count}` : ""}${
+        doc.summary ? `\n   Summary: ${doc.summary}` : ""
+      }`;
+    })
+    .join("\n\n");
+
+  // Construct the full prompt
+  return `Please analyze my reading patterns from the past 6 months and provide insights about my interests and preferences.
+
+===== MY READING HISTORY (PAST 6 MONTHS) =====
+These are articles I've read more than 75% of in the past 6 months, indicating I found them valuable:
+
+${readingHistoryPrompt}
+
+===== ANALYSIS INSTRUCTIONS =====
+Based on my reading history shown above, please provide a comprehensive analysis of my reading patterns and interests. Consider the following aspects:
+
+1. Core Topics: What main subjects or fields do I consistently engage with?
+2. Technology Preferences: What technologies, programming languages, or tools am I interested in?
+3. Learning Patterns: Am I focused on practical tutorials, theoretical concepts, or both?
+4. Content Type Preferences: Based on the word count, what is the mix of short- vs. long-form content?
+5. Industry Focus: Which industries or sectors appear in my reading?
+7. Evolution of Interests: How have my interests changed or evolved over the period?
+8. Depth vs. Breadth: Do I tend to deep-dive into specific topics or explore broadly across different areas?
+9. Content Sources: Are there specific websites/publications I frequently read?
+10. Knowledge Gaps: Based on related topics I'm interested in, what areas might I benefit from exploring?
+
+Please organize your analysis into clearly labeled sections addressing these different aspects of my reading behavior, and provide specific examples from my reading history to support your observations.
+
+Your analysis will help me better understand my own information consumption patterns and help me make more intentional choices about what to read in the future.`;
+}
+
+/**
+ * Generates a recommendation prompt for TLDR newsletter articles without reading history analysis
+ * @param tldrArticles - Articles extracted from TLDR newsletters
+ * @param recommendedArticleCount - The number of articles to recommend
+ * @returns A string containing the prompt for an AI assistant
+ */
+export function generateRecommendationPromptWithoutAnalysis(
+  tldrArticles: TLDRArticle[],
+  recommendedArticleCount: number = 10
+): string {
+  // Create a part of the prompt that lists the new TLDR articles
+  const tldrArticlesPrompt = tldrArticles
+    .map((article, index) => {
+      return `${index + 1}. "${article.title}" 
+   URL: ${article.url}
+   Summary: ${article.summary}`;
+    })
+    .join("\n\n");
+
+  // Construct the full prompt
+  return `Please recommend which of these TLDR newsletter articles I should save for reading this week.
+
+===== TLDR NEWSLETTER ARTICLES =====
+${tldrArticlesPrompt}
+
+===== RECOMMENDATION INSTRUCTIONS =====
+I'd like you to recommend approximately ${recommendedArticleCount} articles from this list that are most likely to be valuable to me.
+
+Please assume I'm a software engineer with interests in web development, cloud architecture, AI/ML technologies, and software engineering best practices.
+
+Format your response as follows:
+1. A brief explanation of why you're recommending each article (grouped by theme if possible)
+2. End with a structured list of ONLY the recommended article URLs, one per line, with no additional text or formatting. These should be raw URLs starting with http:// or https:// without any wrapping formatting or punctuation.
+
+IMPORTANT - URL ACCURACY GUIDELINES:
+- Ensure URLs point directly to the original content (avoid proxy, tracking or redirect links)
+- If a URL contains tracking parameters or unnecessary query strings, remove them
+- Double check that each URL is complete and not truncated
+- Make sure all recommended URLs actually exist and are not fabricated
+
+IMPORTANT: Make sure your final list of URLs is clearly separated from other text and formatted exactly like this:
+
+https://example.com/article1
+https://example.com/article2
+https://example.com/article3
+
+DO NOT include any additional text, numbers, bullet points, or formatting around the URLs in this final list.`;
+}
+
+/**
  * Extracts URLs from the AI's response
  * @param aiResponse - The text response from the AI
  * @returns An array of URLs

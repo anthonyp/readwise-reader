@@ -3,6 +3,8 @@ import { config } from "./config";
 import { parseTLDRLinks } from "./services/tldr";
 import {
   generateRecommendationPrompt,
+  generateReadingPatternAnalysisPrompt,
+  generateRecommendationPromptWithoutAnalysis,
   extractURLsFromResponse,
   testURLExtraction,
 } from "./services/promptGenerator";
@@ -19,20 +21,52 @@ function createReadlineInterface() {
   });
 }
 
-// Main function with the application flow
-async function main() {
-  // Check for test mode
-  if (process.argv.includes("--test-url-extraction")) {
-    console.log("Running URL extraction test mode...");
-    testURLExtraction();
-    return;
+// Function to analyze reading patterns from the past 6 months
+async function analyzeReadingPatterns() {
+  const sdk = new ReadwiseReaderSDK(config.READWISE_READER_KEY);
+
+  console.log("Readwise Reader - Reading Pattern Analysis");
+  console.log("=========================================");
+
+  try {
+    console.log("Fetching your reading history from the past 6 months...");
+    // Get well-read documents from the past 6 months
+    const wellReadDocs = await sdk.getWellReadDocuments(6, "months");
+    console.log(
+      `Found ${wellReadDocs.length} well-read documents from the past 6 months for analysis.`
+    );
+
+    console.log("\nGenerating AI analysis prompt...");
+    // Generate the prompt for reading pattern analysis
+    const prompt = generateReadingPatternAnalysisPrompt(wellReadDocs);
+
+    // Save prompt to file
+    const promptFilename = await saveTextToFile(prompt, {
+      filenamePrefix: "reading-pattern-analysis",
+    });
+    console.log(`Prompt saved to file: ${promptFilename}`);
+    console.log(`Attempting to open the file automatically...`);
+
+    // Try to open the file
+    await openFile(promptFilename);
+
+    console.log(
+      `\nPlease copy this prompt into ChatGPT or similar AI assistant to get an analysis of your reading patterns.`
+    );
+  } catch (error) {
+    console.error("An error occurred:", error);
   }
 
+  console.log("\nProcess complete!");
+}
+
+// Function to recommend articles from TLDR newsletters
+async function recommendArticles() {
   const sdk = new ReadwiseReaderSDK(config.READWISE_READER_KEY);
   const rl = createReadlineInterface();
 
-  console.log("Readwise Reader AI Recommender");
-  console.log("=============================");
+  console.log("Readwise Reader - Article Recommendations");
+  console.log("========================================");
 
   try {
     console.log("Step 1: Fetching TLDR newsletter articles...");
@@ -69,21 +103,17 @@ async function main() {
       `Found ${allTLDRArticles.length} articles from TLDR newsletters.`
     );
 
-    console.log("\nStep 2: Fetching your reading history...");
-    // Get well-read documents
-    const weeksBack = 4; // Define how many weeks to look back
-    const wellReadDocs = await sdk.getWellReadDocuments(weeksBack);
-    console.log(
-      `Found ${wellReadDocs.length} well-read documents from the past ${weeksBack} weeks for analysis.`
+    console.log("\nStep 2: Generating AI recommendation prompt...");
+    // Generate the prompt for recommendations without reading analysis
+    const recommendedArticleCount = 10; // Default to 10 articles
+    const prompt = generateRecommendationPromptWithoutAnalysis(
+      allTLDRArticles,
+      recommendedArticleCount
     );
-
-    console.log("\nStep 3: Generating AI recommendation prompt...");
-    // Generate the prompt
-    const prompt = generateRecommendationPrompt(allTLDRArticles, wellReadDocs);
 
     // Save prompt to file
     const promptFilename = await saveTextToFile(prompt, {
-      filenamePrefix: "ai-recommendation-prompt",
+      filenamePrefix: "article-recommendation-prompt",
     });
     console.log(`Prompt saved to file: ${promptFilename}`);
     console.log(`Attempting to open the file automatically...`);
@@ -96,7 +126,7 @@ async function main() {
     );
 
     // Ask user for the AI response
-    console.log("\nStep 4: Processing AI recommendations");
+    console.log("\nStep 3: Processing AI recommendations");
     console.log(
       "After you get recommendations from the AI assistant, paste the entire response below."
     );
@@ -250,7 +280,7 @@ async function main() {
       saveConfirmation.toLowerCase() === "y" ||
       saveConfirmation.toLowerCase() === "yes"
     ) {
-      console.log("\nStep 5: Creating documents from recommended URLs...");
+      console.log("\nStep 4: Creating documents from recommended URLs...");
       console.log(
         "Using rate limiting: 1 article every 1.5 seconds to avoid overwhelming the API."
       );
@@ -276,6 +306,47 @@ async function main() {
   }
 
   console.log("\nProcess complete!");
+}
+
+// Main function that parses command line arguments and runs the appropriate command
+async function main() {
+  // Check for test mode
+  if (process.argv.includes("--test-url-extraction")) {
+    console.log("Running URL extraction test mode...");
+    testURLExtraction();
+    return;
+  }
+
+  const command = process.argv[2] || "recommend";
+
+  // Show help if requested
+  if (command === "--help" || command === "-h") {
+    console.log("Readwise Reader CLI Usage");
+    console.log("=======================");
+    console.log("Available commands:");
+    console.log(
+      "  analyze-reading   - Analyze reading patterns from the past 6 months"
+    );
+    console.log(
+      "  recommend         - Get article recommendations from TLDR newsletter"
+    );
+    console.log("  --test-url-extraction - Test URL extraction functionality");
+    console.log("  --help, -h       - Show this help message");
+    return;
+  }
+
+  // Run the appropriate command
+  switch (command) {
+    case "analyze-reading":
+      await analyzeReadingPatterns();
+      break;
+    case "recommend":
+      await recommendArticles();
+      break;
+    default:
+      console.log(`Unknown command: ${command}`);
+      console.log("Use --help to see available commands");
+  }
 }
 
 // Run the main function

@@ -160,14 +160,22 @@ export class ReadwiseReaderSDK {
 
   /**
    * Retrieve documents that have been read to a significant extent.
-   * Gets documents from the archive with reading progress > 75% from the past few weeks.
-   * @param weeksBack - Number of weeks to look back (defaults to 4)
+   * Gets documents from the archive with reading progress > 75% from the past few weeks or months.
+   * @param timeFrame - Number of weeks or months to look back (defaults to 4 weeks)
+   * @param timeUnit - The unit of time to use ('weeks' or 'months', defaults to 'weeks')
    * @returns Promise resolving to an array of well-read documents.
    */
-  async getWellReadDocuments(weeksBack: number = 4): Promise<Document[]> {
-    // Calculate date from a few weeks ago
+  async getWellReadDocuments(
+    timeFrame: number = 4,
+    timeUnit: "weeks" | "months" = "weeks"
+  ): Promise<Document[]> {
+    // Calculate date from the specified time ago
     const pastDate = new Date();
-    pastDate.setDate(pastDate.getDate() - weeksBack * 7);
+    if (timeUnit === "weeks") {
+      pastDate.setDate(pastDate.getDate() - timeFrame * 7);
+    } else {
+      pastDate.setMonth(pastDate.getMonth() - timeFrame);
+    }
 
     // Format date as ISO string for the API
     const pastDateString = pastDate.toISOString();
@@ -178,7 +186,7 @@ export class ReadwiseReaderSDK {
 
     // Loop to handle pagination
     do {
-      // Get documents from the archive from the past few weeks
+      // Get documents from the archive from the past specified timeframe
       const response = await this.listDocuments({
         location: "archive",
         updatedAfter: pastDateString,
