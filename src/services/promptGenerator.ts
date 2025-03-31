@@ -47,7 +47,7 @@ export function generateReadingPatternAnalysisPrompt(
   // Create a part of the prompt that lists the user's reading history
   const readingHistoryPrompt = wellReadDocs
     .map((doc) => {
-      return `- "${doc.title}" (${doc.url})${
+      return `- "${doc.title}"${doc.url ? `\n   URL: ${doc.url}` : ""}${
         doc.last_moved_at ? `\n   Date read: ${doc.last_moved_at}` : ""
       }${doc.word_count ? `\n   Word Count: ${doc.word_count}` : ""}${
         doc.summary ? `\n   Summary: ${doc.summary}` : ""
