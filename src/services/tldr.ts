@@ -1,9 +1,8 @@
 import { JSDOM } from "jsdom";
+import { TLDRArticle } from "../types";
 
-export function parseTLDRLinks(
-  htmlContent: string
-): Array<{ url: string; title: string; summary: string }> {
-  const links: Array<{ url: string; title: string; summary: string }> = [];
+export function parseTLDRLinks(htmlContent: string): TLDRArticle[] {
+  const links: TLDRArticle[] = [];
 
   // Create a DOM from the HTML content using JSDOM
   const dom = new JSDOM(htmlContent);

@@ -157,4 +157,47 @@ export class ReadwiseReaderSDK {
     }
     // For DELETE, we expect a 204 No Content response.
   }
+
+  /**
+   * Retrieve documents that have been read to a significant extent.
+   * Gets documents from the archive with reading progress > 75% from the past few weeks.
+   * @param weeksBack - Number of weeks to look back (defaults to 4)
+   * @returns Promise resolving to an array of well-read documents.
+   */
+  async getWellReadDocuments(weeksBack: number = 4): Promise<Document[]> {
+    // Calculate date from a few weeks ago
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - weeksBack * 7);
+
+    // Format date as ISO string for the API
+    const pastDateString = pastDate.toISOString();
+
+    // Array to store all documents
+    let allDocuments: Document[] = [];
+    let nextPageCursor: string | undefined = undefined;
+
+    // Loop to handle pagination
+    do {
+      // Get documents from the archive from the past few weeks
+      const response = await this.listDocuments({
+        location: "archive",
+        updatedAfter: pastDateString,
+        withHtmlContent: false, // We don't need the HTML content for this query
+        pageCursor: nextPageCursor,
+      });
+
+      // Add results to our collection
+      allDocuments = [...allDocuments, ...response.results];
+
+      // Update cursor for next page
+      nextPageCursor = response.nextPageCursor;
+    } while (nextPageCursor);
+
+    // Filter documents with reading progress > 75%
+    const wellReadDocs = allDocuments.filter(
+      (doc) => doc.reading_progress > 0.75
+    );
+
+    return wellReadDocs;
+  }
 }
