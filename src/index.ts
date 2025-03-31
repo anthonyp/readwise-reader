@@ -2,9 +2,9 @@ import { ReadwiseReaderSDK } from "./services/reader";
 import { config } from "./config";
 import { parseTLDRLinks } from "./services/tldr";
 import {
-  generateRecommendationPrompt,
+  readingAnalysis,
   generateReadingPatternAnalysisPrompt,
-  generateRecommendationPromptWithoutAnalysis,
+  generateRecommendationPrompt,
   extractURLsFromResponse,
   testURLExtraction,
 } from "./services/promptGenerator";
@@ -103,13 +103,12 @@ async function recommendArticles() {
       `Found ${allTLDRArticles.length} articles from TLDR newsletters.`
     );
 
+    const wellReadDocs = await sdk.getWellReadDocuments(6, "weeks");
+    const analysis = readingAnalysis(allTLDRArticles, wellReadDocs);
+
     console.log("\nStep 2: Generating AI recommendation prompt...");
     // Generate the prompt for recommendations without reading analysis
-    const recommendedArticleCount = 10; // Default to 10 articles
-    const prompt = generateRecommendationPromptWithoutAnalysis(
-      allTLDRArticles,
-      recommendedArticleCount
-    );
+    const prompt = generateRecommendationPrompt(allTLDRArticles, analysis);
 
     // Save prompt to file
     const promptFilename = await saveTextToFile(prompt, {

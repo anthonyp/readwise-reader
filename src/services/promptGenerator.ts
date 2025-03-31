@@ -6,7 +6,7 @@ import { Document, TLDRArticle } from "../types";
  * @param wellReadDocs - Documents the user has read
  * @returns Object with analysis information
  */
-function analyzeReadingPatterns(
+export function readingAnalysis(
   tldrArticles: TLDRArticle[],
   wellReadDocs: Document[]
 ): {
@@ -15,8 +15,8 @@ function analyzeReadingPatterns(
   recommendedArticleCount: number;
 } {
   // Calculate user's reading capacity based on history and timeframe
-  // Assuming the well-read docs are from the last 4 weeks (28 days)
-  const readingCapacityPerDay = wellReadDocs.length / 28;
+  // Assuming the well-read docs are from the last 6 weeks
+  const readingCapacityPerDay = wellReadDocs.length / (6 * 7);
 
   // User saves about 3x more articles than they end up reading thoroughly
   const savingCapacityPerDay = readingCapacityPerDay * 2;
@@ -34,89 +34,6 @@ function analyzeReadingPatterns(
     savingCapacityPerDay,
     recommendedArticleCount,
   };
-}
-
-/**
- * Generates a prompt for AI recommendation of TLDR newsletter articles based on reading history
- * @param tldrArticles - Articles extracted from TLDR newsletters
- * @param wellReadDocs - Documents the user has read and enjoyed (>75% read)
- * @returns A string containing the prompt for an AI assistant
- */
-export function generateRecommendationPrompt(
-  tldrArticles: TLDRArticle[],
-  wellReadDocs: Document[]
-): string {
-  // Analyze reading patterns to provide context for recommendations
-  const analysis = analyzeReadingPatterns(tldrArticles, wellReadDocs);
-
-  // Create a part of the prompt that lists the user's reading history
-  const readingHistoryPrompt = wellReadDocs
-    .map((doc) => {
-      return `- "${doc.title}" (${doc.url})${
-        doc.tags.length > 0 ? ` [Tags: ${doc.tags.join(", ")}]` : ""
-      }${doc.summary ? `\n   Summary: ${doc.summary}` : ""}`;
-    })
-    .join("\n\n");
-
-  // Create a part of the prompt that lists the new TLDR articles
-  const tldrArticlesPrompt = tldrArticles
-    .map((article, index) => {
-      return `${index + 1}. "${article.title}" 
-   URL: ${article.url}
-   Summary: ${article.summary}`;
-    })
-    .join("\n\n");
-
-  // Construct the full prompt
-  return `Please analyze the following information and recommend which articles I should save for reading this week:
-
-===== READING PATTERNS =====
-Based on my history, I read approximately ${analysis.readingCapacityPerDay.toFixed(
-    1
-  )} articles per day, but I typically save about ${analysis.savingCapacityPerDay.toFixed(
-    1
-  )} articles per day (roughly 2x more than I thoroughly read).
-So I'd like you to recommend about ${
-    analysis.recommendedArticleCount
-  } articles that match my interests.
-
-===== RECENTLY READ AND ENJOYED ARTICLES =====
-These are articles I've read more than 75% of in the past few weeks, indicating I found them valuable:
-
-${readingHistoryPrompt}
-
-===== NEW TLDR NEWSLETTER ARTICLES =====
-${tldrArticlesPrompt}
-
-===== RECOMMENDATION INSTRUCTIONS =====
-Based on my reading history and preferences shown above, please recommend which of the TLDR articles I should save for reading this week. Consider the following:
-
-1. Look for patterns in my reading history - topics, technologies, or themes I seem interested in
-2. Prioritize articles that align with my demonstrated interests
-3. A small percentage of articles that you include should broaden my perspective, but still be related to my interests
-4. Avoid recommending articles on topics I don't seem to engage with
-5. Recommend approximately ${
-    analysis.recommendedArticleCount
-  } articles (but you can adjust if you think more or fewer would be appropriate)
-
-Format your response as follows:
-1. A brief explanation of your analysis of my reading preferences
-2. A brief explanation of why you're recommending each article (grouped by theme if possible)
-3. End with a structured list of ONLY the recommended article URLs, one per line, with no additional text or formatting. These should be raw URLs starting with http:// or https:// without any wrapping formatting or punctuation.
-
-IMPORTANT - URL ACCURACY GUIDELINES:
-- Ensure URLs point directly to the original content (avoid proxy, tracking or redirect links)
-- If a URL contains tracking parameters or unnecessary query strings, remove them
-- Double check that each URL is complete and not truncated
-- Make sure all recommended URLs actually exist and are not fabricated
-
-IMPORTANT: Make sure your final list of URLs is clearly separated from other text and formatted exactly like this:
-
-https://example.com/article1
-https://example.com/article2
-https://example.com/article3
-
-DO NOT include any additional text, numbers, bullet points, or formatting around the URLs in this final list.`;
 }
 
 /**
@@ -165,14 +82,18 @@ Your output will be used in a subsequent prompt that helps recommend articles to
 }
 
 /**
- * Generates a recommendation prompt for TLDR newsletter articles without reading history analysis
+ * Generates a recommendation prompt for TLDR newsletter articles
  * @param tldrArticles - Articles extracted from TLDR newsletters
  * @param recommendedArticleCount - The number of articles to recommend
  * @returns A string containing the prompt for an AI assistant
  */
-export function generateRecommendationPromptWithoutAnalysis(
+export function generateRecommendationPrompt(
   tldrArticles: TLDRArticle[],
-  recommendedArticleCount: number = 10
+  analysis: {
+    readingCapacityPerDay: number;
+    savingCapacityPerDay: number;
+    recommendedArticleCount: number;
+  }
 ): string {
   // Create a part of the prompt that lists the new TLDR articles
   const tldrArticlesPrompt = tldrArticles
@@ -184,7 +105,17 @@ export function generateRecommendationPromptWithoutAnalysis(
     .join("\n\n");
 
   // Construct the full prompt
-  return `I am going to provide you with an analysis of my reading preferences, along with new articles from the TLDR Newsletter that should be considered for reading. Your goal is to recommend a subset of the new TLDR articles that I should save for reading this week.
+  return `I am going to provide you with an analysis of my reading patterns and preferences, along with new articles from the TLDR Newsletter that should be considered for reading. Your goal is to recommend a subset of the new TLDR articles that I should save for reading this week.
+
+===== READING PATTERNS =====
+Based on my history, I read approximately ${analysis.readingCapacityPerDay.toFixed(
+    1
+  )} articles per day, but I typically save about ${analysis.savingCapacityPerDay.toFixed(
+    1
+  )} articles per day (roughly 2x more than I thoroughly read).
+So I'd like you to recommend about ${
+    analysis.recommendedArticleCount
+  } articles that match my interests.
 
 ===== MY READING PREFERENCES =====
 **1. My Core Topics**  
@@ -219,7 +150,11 @@ In short, I’m a reader who dives into **technology leadership, AI advances, an
 ${tldrArticlesPrompt}
 
 ===== RECOMMENDATION INSTRUCTIONS =====
-I'd like you to recommend approximately ${recommendedArticleCount} articles from this list that are most likely to be valuable to me.
+Based on my reading patterns andpreferences shown above, please recommend which of the TLDR articles I should save for reading this week. Consider the following:
+1. Prioritize articles that align with my preferences
+2. Recommend approximately ${
+    analysis.recommendedArticleCount
+  } articles (but you can adjust if you think more or fewer would be appropriate)
 
 Format your response as follows:
 1. A brief explanation of why you're recommending each article (grouped by theme if possible)
