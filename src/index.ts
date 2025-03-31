@@ -7,67 +7,15 @@ import {
   testURLExtraction,
 } from "./services/promptGenerator";
 import { createDocumentsFromRecommendations } from "./services/aiRecommender";
+import { saveTextToFile, openFile } from "./services/fileService";
 import { TLDRArticle } from "./types";
 import * as readline from "readline";
-import { promises as fs } from "fs";
-import { exec } from "child_process";
-import * as os from "os";
-import * as path from "path";
 
 // Helper function for user input
 function createReadlineInterface() {
   return readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-  });
-}
-
-async function savePromptToFile(prompt: string): Promise<string> {
-  // Save to the user's downloads for easier access
-  const downloadsPath = path.join(os.homedir(), "Downloads");
-  const filename = `ai-recommendation-prompt-${Date.now()}.txt`;
-  const filePath = path.join(downloadsPath, filename);
-
-  try {
-    await fs.writeFile(filePath, prompt, "utf-8");
-    return filePath;
-  } catch (error) {
-    // If can't save to downloads, fallback to current directory
-    console.error(
-      "Could not save to downloads, saving to current directory instead."
-    );
-    await fs.writeFile(filename, prompt, "utf-8");
-    return filename;
-  }
-}
-
-// Helper function to try opening a file
-function openFile(filePath: string): Promise<void> {
-  return new Promise((resolve) => {
-    const platform = os.platform();
-    let command = "";
-
-    if (platform === "darwin") {
-      command = `open "${filePath}"`;
-    } else if (platform === "win32") {
-      command = `start "" "${filePath}"`;
-    } else if (platform === "linux") {
-      command = `xdg-open "${filePath}"`;
-    }
-
-    if (command) {
-      exec(command, (error) => {
-        if (error) {
-          console.log(
-            `Could not open file automatically. The file is saved at: ${filePath}`
-          );
-        }
-        resolve();
-      });
-    } else {
-      console.log(`The file is saved at: ${filePath}`);
-      resolve();
-    }
   });
 }
 
@@ -134,7 +82,9 @@ async function main() {
     const prompt = generateRecommendationPrompt(allTLDRArticles, wellReadDocs);
 
     // Save prompt to file
-    const promptFilename = await savePromptToFile(prompt);
+    const promptFilename = await saveTextToFile(prompt, {
+      filenamePrefix: "ai-recommendation-prompt",
+    });
     console.log(`Prompt saved to file: ${promptFilename}`);
     console.log(`Attempting to open the file automatically...`);
 
@@ -177,8 +127,9 @@ async function main() {
       );
 
       // Save the problematic response to a file for debugging
-      const debugFilename = `debug-ai-response-${Date.now()}.txt`;
-      await fs.writeFile(debugFilename, aiResponse, "utf-8");
+      const debugFilename = await saveTextToFile(aiResponse, {
+        filenamePrefix: "debug-ai-response",
+      });
       console.log(
         `Saved problematic AI response to ${debugFilename} for debugging purposes.`
       );

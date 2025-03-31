@@ -6,3 +6,4 @@ tmp/
 
 # Generated prompt files
 ai-recommendation-prompt-*.txt
+debug-ai-response-*.txt
