@@ -161,7 +161,7 @@ Based on my reading history shown above, please provide a comprehensive analysis
 
 Please organize your analysis into clearly labeled sections addressing these different aspects of my reading behavior, and provide specific examples from my reading history to support your observations.
 
-Your analysis will help me better understand my own information consumption patterns and help me make more intentional choices about what to read in the future.`;
+Your output will be used in a subsequent prompt that helps recommend articles to me, so please ensure your output is returned to me in the first person.`;
 }
 
 /**
@@ -184,15 +184,42 @@ export function generateRecommendationPromptWithoutAnalysis(
     .join("\n\n");
 
   // Construct the full prompt
-  return `Please recommend which of these TLDR newsletter articles I should save for reading this week.
+  return `I am going to provide you with an analysis of my reading preferences, along with new articles from the TLDR Newsletter that should be considered for reading. Your goal is to recommend a subset of the new TLDR articles that I should save for reading this week.
 
-===== TLDR NEWSLETTER ARTICLES =====
+===== MY READING PREFERENCES =====
+**1. My Core Topics**  
+Over the past six months, my reading has gravitated toward a few central themes. I consistently explore **AI and large language models** (e.g., articles on DeepSeek’s AI breakthroughs, OpenAI’s policy moves, and “Why AI reminds me of cloud computing”). I also find myself deep in **product management and leadership** (for instance, the "A Smart Bear" blog posts on startup strategy, multiple pieces on product-led growth, and resources on building effective teams). Additionally, I have a strong interest in **engineering best practices** (reading about chat-oriented programming, Terraform/PagerDuty integrations, load balancing, and mental models for engineering managers). Now and then, I explore **broader societal or environmental issues**—like microplastics in plants or climate change’s impact on food security.
+
+**2. My Technology Preferences**  
+I am particularly drawn to **cloud services, infrastructure as code, and AI frameworks**. PagerDuty’s Terraform provider, the shift toward “Operations as Code,” and references to GitHub Copilot or Cursor AI reflect an interest in **automation and DevOps**. I read about **load balancing** algorithms (Prequal) and follow the evolution of **LLMs** from OpenAI, Meta (Llama), and smaller open-source projects. While I’m not always diving into specific programming languages, I show a preference for **tools that streamline development**—especially AI-powered ones.
+
+**3. My Learning Patterns**  
+I engage with **both practical tutorials and strategic/theoretical discussions**. On the practical side, I read articles like “How to Manage Flaky Tests,” “How I write code using Cursor,” and topics on Terraform usage, which are more hands-on. On the strategic side, I read a lot about **startup leadership, product strategy, and management techniques** (e.g., mental models for managers, how to develop a compelling product vision, and the concept of product-led growth). This blend of content indicates that I like to balance **applicable how-tos** with **broader conceptual frameworks**.
+
+**4. My Content Type Preferences**  
+My reading includes a wide range of **word counts**, from short, 400–600 word news updates (e.g., political headlines, quick tech updates) to deep dives of 2,000–3,000 words or more on leadership frameworks and industry analyses. I consistently engage with **longer-form articles** on business and tech topics—pieces like “The 30 Best Pieces of Company Building Advice” often run several thousand words. At the same time, I’ll read shorter, **fast news bites** about certain topics, like AI regulation. So I’m comfortable **mixing quick reads with in-depth reports** depending on the subject matter.
+
+**5. My Industry Focus**  
+Most of my reading centers on the **technology industry**, with sub-focuses on **SaaS, cloud infrastructure, AI, and venture capital**. I also consume content about **ed-tech** and occasionally about **consumer products** (iPhone rumors, Apple’s approach to in-house chips). Overall, though, I’m predominantly invested in **startups, software engineering, and emerging tech**.
+
+**6. My Evolution of Interests**  
+My interest in **AI** has heightened during this six-month window. Early reads (January and February) included content about meta’s generative AI challenges, while more recent reads show me tracking **new open-source models** and **regulatory developments**. I’ve also been reading about **PLG (product-led growth)** fairly consistently, but it intensified around March (“How to Turn the PLG Dial,” “Avoid PLG Failure”). Additionally, my **management and leadership** readings have stayed constant—whether about mental models for managers or building robust product teams. Other topics show up sporadically but haven’t formed a dominant thread; they’re more like **punctual interests** that pop up.
+
+**7. My Depth vs. Breadth**  
+My reading habit is **moderately deep but quite broad**. I return to **product and engineering leadership** themes repeatedly—going deep on mental models, best practices, and real-world examples. At the same time, I also branch into **adjacent areas** like VC trends, corporate lawsuits (e.g., WP Engine/Automattic drama), or new AI developments (DeepSeek, GPT-4). I’m not strictly fixated on one single domain, but I do keep returning to **a core set of tech and leadership topics** for a deeper understanding.
+
+**8. My Content Sources**  
+I frequently read pieces from **“A Smart Bear”**, **The New York Times**, **The Verge**, **First Round Review**, and various **blog/news aggregators** (especially around AI developments). Another cluster of sources includes **company posts** (HashiCorp, Salesforce announcements) and **commentary from thought leaders** on LinkedIn or Substack. This fairly wide variety suggests I trust a blend of mainstream journalism, specialized tech blogs, and personal newsletters.
+
+---
+
+**Summary of My Reading Behavior**  
+In short, I’m a reader who dives into **technology leadership, AI advances, and product-focused insights**, balanced by occasional coverage of big-picture social concerns like education funding, environmental risks, etc. I enjoy a **mix of short-form news** for staying current and **longer-form essays** for richer, strategic thinking. My reading tends to **circle back** to central pillars—**AI, product management, SaaS, and leadership**—yet I’m **open to exploring** a variety of adjacent topics, ensuring I stay informed about the broader context that surrounds modern tech and entrepreneurship.
+===== NEW TLDR NEWSLETTER ARTICLES =====
 ${tldrArticlesPrompt}
 
 ===== RECOMMENDATION INSTRUCTIONS =====
 I'd like you to recommend approximately ${recommendedArticleCount} articles from this list that are most likely to be valuable to me.
-
-Please assume I'm a software engineer with interests in web development, cloud architecture, AI/ML technologies, and software engineering best practices.
 
 Format your response as follows:
 1. A brief explanation of why you're recommending each article (grouped by theme if possible)
