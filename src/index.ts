@@ -5,8 +5,7 @@ import {
   readingAnalysis,
   generateReadingPatternAnalysisPrompt,
   generateRecommendationPrompt,
-  extractURLsFromResponse,
-  testURLExtraction,
+  extractTitlesAndMatchURLs,
 } from "./services/promptGenerator";
 import { createDocumentsFromRecommendations } from "./services/aiRecommender";
 import { saveTextToFile, openFile } from "./services/fileService";
@@ -140,19 +139,21 @@ async function recommendArticles() {
       aiResponse += line + "\n";
     }
 
-    // Parse URLs from the AI response
-    console.log("\nAttempting to extract URLs from the AI response...");
-    const recommendedUrls = extractURLsFromResponse(aiResponse);
+    // Parse titles from the AI response and match them to URLs
     console.log(
-      `\nExtracted ${recommendedUrls.length} recommended URLs from the AI response.`
+      "\nAttempting to extract article titles from the AI response and match them to URLs..."
+    );
+    const recommendedUrls = extractTitlesAndMatchURLs(
+      aiResponse,
+      allTLDRArticles
+    );
+    console.log(
+      `\nExtracted and matched ${recommendedUrls.length} recommended articles from the AI response.`
     );
 
     if (recommendedUrls.length === 0) {
       console.log(
-        "No URLs were found in the AI response. Please check your input and try again."
-      );
-      console.log(
-        "You can debug URL extraction by running: node dist/index.js --test-url-extraction"
+        "No article matches were found. Please check your input and try again."
       );
 
       // Save the problematic response to a file for debugging
@@ -169,7 +170,10 @@ async function recommendArticles() {
     // Display the URLs and ask for confirmation
     console.log("\nURLs to be saved:");
     recommendedUrls.forEach((url, index) => {
-      console.log(`${index + 1}. ${url}`);
+      // Find the article title for this URL
+      const article = allTLDRArticles.find((a) => a.url === url);
+      const title = article ? article.title : "Unknown title";
+      console.log(`${index + 1}. ${title}\n   ${url}`);
     });
 
     console.log("\nPlease review the URLs above for accuracy.");
@@ -309,13 +313,6 @@ async function recommendArticles() {
 
 // Main function that parses command line arguments and runs the appropriate command
 async function main() {
-  // Check for test mode
-  if (process.argv.includes("--test-url-extraction")) {
-    console.log("Running URL extraction test mode...");
-    testURLExtraction();
-    return;
-  }
-
   const command = process.argv[2] || "recommend";
 
   // Show help if requested
@@ -329,7 +326,6 @@ async function main() {
     console.log(
       "  recommend         - Get article recommendations from TLDR newsletter"
     );
-    console.log("  --test-url-extraction - Test URL extraction functionality");
     console.log("  --help, -h       - Show this help message");
     return;
   }
