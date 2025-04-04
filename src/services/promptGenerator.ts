@@ -119,25 +119,27 @@ So I'd like you to recommend about ${
 
 ===== MY READING PREFERENCES =====
 ## 1. My Core Topics
-I have a strong pattern of reading about **software engineering, AI, and product leadership**, alongside startup culture and personal/professional development. I've also mixed in articles about **environmental science**, **public policy**, and **health/science breakthroughs**. But overall, the technical and leadership topics dominate.
+I have a strong pattern of reading about **software engineering, AI, and product & engineering leadership**, alongside startup culture and personal/professional development. I've also mixed in articles about **environmental science**, **public policy**, and **health/science breakthroughs**. But overall, the technical and leadership topics dominate.
 
 Specific examples include:
 
 - **Software & AI:** Articles like "Operations as Code: Operational Excellence with PagerDuty," "How to use AI to increase Software Development productivity," and "Why AI reminds me of cloud computing." I prefer practical AI applications and mass market releases rather than theoretical or academic AI research.
-- **Leadership & Startups:** Reads such as "A Smart Bear » 'I scratched my own itch' isn't good enough" and "7 proven mental models for engineering managers."
+- **Leadership & Organization:** Reads such as "A Smart Bear » 'I scratched my own itch' isn't good enough," "7 proven mental models for engineering managers," "Why Backlog Management Is Dangerous for Most Teams," and "Career Development: What It Really Means to be a Manager, Director, or VP."
+- **Business Outcomes & Cautionary Tales:** I'm drawn to analyses of both successful and failed business ventures, like "The Downfall of 23andMe's Billion-dollar Bet" and case studies of product/market fit failures.
 - **Environment/Science:** "Microplastics hinder plant photosynthesis, study finds..." and "Scientists glue two proteins together, driving cancer cells to self-destruct."
 
 ---
 
 ## 2. My Technology Preferences
 I consistently show interest in:
-
-- **DevOps and Cloud Infrastructure:** I've read about **Terraform** ("By using PagerDuty's Terraform provider..."), load balancing ("Load is not what you should balance... Introducing Prequal"), and the importance of **automation** ("Operations as Code helps organizations manage operational tasks...").  
-- **Generative AI & Coding Tools:** Articles about **GitHub Copilot**, **Cursor AI**, and references to training large language models (LLMs), e.g., "Team Says They've Recreated DeepSeek's OpenAI Killer...". I'm more interested in applied AI technologies and product releases than academic or highly theoretical AI research.
+ 
+- **Generative AI & Coding Tools:** Articles about **GitHub Copilot**, **Cursor AI**, and references to training large language models (LLMs), e.g., "Team Says They've Recreated DeepSeek's OpenAI Killer...". I'm interested in applied AI technologies and product releases—both the technology itself AND broader discussions about their impact on product & engineering culture. I do NOT enjoy reading about highly theoretical or academic research behind AI.
+- **Product & Engineering Culture and Best Practices:** "How to manage flaky tests," "The Death of the Junior Developer," "Engineering maturity models," etc.
+- **Product & Engineering Team Operations:** Articles discussing practical aspects of how product &engineering teams function day-to-day.
+- **DevOps and Cloud Infrastructure:** I've read about **Terraform** ("By using PagerDuty's Terraform provider..."), load balancing ("Load is not what you should balance... Introducing Prequal"), and the importance of **automation** ("Operations as Code helps organizations manage operational tasks..."). 
 - **Cybersecurity Trends:** I follow broad industry trends and strategic approaches to security, but I'm not interested in specific vulnerability reports, CVE details, or technical security bulletins.
-- **Engineering Culture and Best Practices:** "How to manage flaky tests," "The Death of the Junior Developer," "Engineering maturity models," etc.
 
-I enjoy staying updated on practical DevOps automation, AI development, and overall engineering productivity.
+I enjoy staying updated on practical AI development, overall product & engineering culture, DevOps automation, and the meta-level implications of these technologies on the future of work.
 
 ---
 
@@ -162,10 +164,10 @@ Overall, my reading is fairly **balanced** between mid-length (1k–2k) articles
 My readings touch a few major industries:
 
 - **Tech & Software**: Dominant—covering everything from AI/ML, DevOps, cloud computing, and engineering management.
-- **Startup & Venture Capital**: Repeated reads on product-led growth (PLG), founder advice, and venture funding ("Andreessen Horowitz, Benchmark and the Transformation of Venture Capital," "What's The Important Thing...").
+- **Startup & Venture Capital**: Repeated reads on product-led growth (PLG), founder advice, compensation trends ("H2 2024 State Of Startup Compensation"), venture funding ("Andreessen Horowitz, Benchmark and the Transformation of Venture Capital," "What's The Important Thing..."), and post-mortems of failed ventures.
 - **Science & Environment**: Significant articles on microplastics, astrophysics (asteroid impact risk), biotech breakthroughs in cancer research, etc.
 
-Still, the lion's share of my reading focuses on **software/tech, AI, startups, and leadership**.
+Still, the lion's share of my reading focuses on **software/tech, AI, startups, and leadership**, particularly articles that examine how organizations operate at scale and how careers evolve within them.
 
 ---
 
@@ -205,7 +207,14 @@ These aren't exact but reflect the dominant share of articles around tech, engin
 ---
 
 ## 10. Summary of My Reading Behavior
-I am drawn to topics that inform my **software engineering** and **technical leadership** knowledge, often diving into **best practices**, **new tools**, **applied AI developments**, and **workplace culture**. I prefer practical AI applications over academic research. While I'm interested in broad cybersecurity trends, I avoid detailed vulnerability reports or CVEs. I also keep myself **well-rounded** with readings on **science and the environment**. Overall, I look for both **practical how-to guidance** and **conceptual or thought-provoking** insights that can be applied to real-world scenarios.
+I am drawn to topics that inform my **software engineering** and **technical leadership** knowledge, often diving into **best practices**, **new tools**, **applied AI developments**, and **workplace culture**. I prefer practical AI applications over academic research. While I'm interested in broad cybersecurity trends, I avoid detailed vulnerability reports or CVEs. 
+
+I'm particularly interested in:
+- **Organizational structures and team dynamics** (e.g. roadmap management, career progression)
+- **Cautionary tales and business failures** that offer valuable lessons
+- **The meta-implications of technological changes** on product & engineering culture and practices
+
+I also keep myself **well-rounded** with readings on **science and the environment**. Overall, I look for both **practical how-to guidance** and **conceptual or thought-provoking** insights that can be applied to real-world scenarios, especially content that helps me understand how organizations operate at scale and how careers evolve within the tech industry.
 
 ---
 
