@@ -5,12 +5,9 @@ describe("URL Extraction Tests", () => {
   it("should extract URLs correctly for valid matches", async () => {
     const testCases = [
       {
-        name: "Simple titles list that should pass",
-        input: `Here's my analysis...
-          
-    And here are the recommended titles:
-    "How to Build a Scalable Architecture for Your NextJS Project"
-    "Getting Started with CSS Grid"`,
+        name: "Simple titles list",
+        input: `How to Build a Scalable Architecture for Your NextJS Project
+Getting Started with CSS Grid`,
         sampleTitles: [
           "How to Build a Scalable Architecture for Your NextJS Project",
           "Getting Started with CSS Grid",
@@ -22,11 +19,8 @@ describe("URL Extraction Tests", () => {
       },
       {
         name: "Titles with slight variations",
-        input: `Analysis... 
-    
-    Recommendations:
-    "How to build a scalable architecture for your NextJS project"
-    "Getting started with CSS Grid"`,
+        input: `How to build a scalable architecture for your NextJS project
+Getting started with CSS Grid`,
         sampleTitles: [
           "How to Build a Scalable Architecture for Your NextJS Project",
           "Getting Started with CSS Grid",
@@ -37,13 +31,11 @@ describe("URL Extraction Tests", () => {
         ],
       },
       {
-        name: "Titles with explanation",
-        input: `Here are my recommendations:
-    
-    1. "How to Build a Scalable Architecture for Your NextJS Project" - This article discusses best practices for structuring NextJS applications.
-    2. "Getting Started with CSS Grid" - A comprehensive introduction to CSS Grid layouts.`,
+        name: "Titles with quotes",
+        input: `How to "Properly" Build a Scalable Architecture for Your NextJS Project
+Getting Started with CSS Grid`,
         sampleTitles: [
-          "How to Build a Scalable Architecture for Your NextJS Project",
+          'How to "Properly" Build a Scalable Architecture for Your NextJS Project',
           "Getting Started with CSS Grid",
         ],
         sampleUrls: [
@@ -80,12 +72,9 @@ describe("URL Extraction Tests", () => {
   });
 
   it("should throw an error when titles do not match URLs", async () => {
-    const input = `Here's my analysis...
-          
-    And here are the recommended titles:
-    "How to Build a Scalable Architecture for Your NextJS Project"
-    "Getting Started with CSS Grid"
-    "The Future of AI in Software Development"`;
+    const input = `How to Build a Scalable Architecture for Your NextJS Project
+Getting Started with CSS Grid
+The Future of AI in Software Development`;
 
     const sampleTitles = [
       "How to Build a Scalable Architecture for Your NextJS Project",

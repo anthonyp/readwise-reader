@@ -230,19 +230,19 @@ Based on my reading patterns and preferences shown above, please recommend which
 
 Format your response as follows:
 1. A brief explanation of why you're recommending each article (grouped by theme if possible)
-2. End with a structured list of ONLY the recommended article TITLES, one per line, with no additional text or formatting. Each title should be EXACTLY as written in the TLDR list above, enclosed in double quotes.
+2. End with a structured list of ONLY the recommended article TITLES, one per line, with no additional text or formatting. Each title should be EXACTLY as written in the TLDR list above.
 
 IMPORTANT - TITLE ACCURACY GUIDELINES:
 - Include ONLY the exact titles as they appear in the TLDR list above
 - Do not modify, abbreviate, or paraphrase the titles
 - Ensure each title is complete and matches exactly one article from the provided list
-- Enclose each title in double quotes
+- Do not enclose titles in quotes, brackets, or any other characters
 
 IMPORTANT: Make sure your final list of titles is clearly separated from other text and formatted exactly like this:
 
-"Title of Article 1"
-"Title of Article 2"
-"Title of Article 3"
+Title of Article 1
+Title of Article 2
+Title of Article 3
 
 DO NOT include any additional text, numbers, bullet points, or formatting around the titles in this final list.`;
 }
@@ -261,14 +261,11 @@ export function extractTitlesAndMatchURLs(
   console.log("Processing AI response for article titles...");
   console.log(`AI response length: ${aiResponse.length} characters`);
 
-  // Match titles enclosed in double quotes
-  const titleRegex = /"([^"]+)"/g;
-  const matches: string[] = [];
-  let match;
-
-  while ((match = titleRegex.exec(aiResponse)) !== null) {
-    matches.push(match[1]); // match[1] contains the title without quotes
-  }
+  // Simply extract all non-empty lines as titles
+  const matches = aiResponse
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line !== ""); // Just filter out empty lines
 
   console.log(`Extracted ${matches.length} titles from AI response`);
 
@@ -278,7 +275,7 @@ export function extractTitlesAndMatchURLs(
     titleToUrlMap.set(article.title, article.url);
   });
 
-  // Match titles to URLs
+  // Match titles to URLs with just exact and case-insensitive matching
   const matchedUrls = matches
     .map((title) => {
       // Try exact match first
@@ -294,17 +291,6 @@ export function extractTitlesAndMatchURLs(
           console.log(
             `Found case-insensitive match for: "${title}" → "${articleTitle}"`
           );
-          return url;
-        }
-      }
-
-      // If still no match, try fuzzy matching (e.g., for minor differences in punctuation or whitespace)
-      for (const [articleTitle, url] of titleToUrlMap.entries()) {
-        // Simple similarity check - removing spaces, punctuation, and comparing lowercase
-        const normalize = (str: string) =>
-          str.toLowerCase().replace(/[^\w]/g, "");
-        if (normalize(articleTitle) === normalize(title)) {
-          console.log(`Found fuzzy match for: "${title}" → "${articleTitle}"`);
           return url;
         }
       }
@@ -325,10 +311,7 @@ export function extractTitlesAndMatchURLs(
       return (
         !titleToUrlMap.has(title) &&
         !Array.from(titleToUrlMap.keys()).some(
-          (articleTitle) =>
-            articleTitle.toLowerCase() === title.toLowerCase() ||
-            articleTitle.toLowerCase().replace(/[^\w]/g, "") ===
-              title.toLowerCase().replace(/[^\w]/g, "")
+          (articleTitle) => articleTitle.toLowerCase() === title.toLowerCase()
         )
       );
     });
