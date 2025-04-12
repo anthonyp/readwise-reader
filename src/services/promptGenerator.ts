@@ -244,6 +244,7 @@ Title of Article 1
 Title of Article 2
 Title of Article 3
 
+DO insert line breaks between each title in the final list.
 DO NOT include any additional text, numbers, bullet points, or formatting around the titles in this final list.`;
 }
 
